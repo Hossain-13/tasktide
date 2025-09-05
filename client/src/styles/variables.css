@@ -1,0 +1,61 @@
+/* CSS Variables - Separate file for color scheme */
+:root {
+  /* Light Mode Colors */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F9FAFB;
+  --bg-tertiary: #F3F4F6;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
+  --border: #E5E7EB;
+  
+  /* Brand Colors */
+  --primary-yellow: #FFD700;
+  --secondary-yellow: #FFC107;
+  --primary-blue: #1E3A8A;
+  --periwinkle: #8B5CF6;
+  --lavender: #A78BFA;
+  
+  /* Status Colors */
+  --success: #10B981;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+  
+  /* Z-index layers */
+  --z-dropdown: 1000;
+  --z-modal: 1050;
+  --z-popover: 1100;
+  --z-tooltip: 1150;
+  --z-toast: 1200;
+}
+
+/* Dark Mode Colors */
+[data-theme="dark"] {
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-tertiary: #334155;
+  --text-primary: #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-tertiary: #94A3B8;
+  --border: #334155;
+  --primary-blue: #3B82F6;
+}
