@@ -6,6 +6,11 @@ import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Assignments from './pages/Assignments';
+import Calendar from './pages/Calendar';
+import Analytics from './pages/Analytics';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 
 import PrivateRoute from './components/common/PrivateRoute';
 import Loading from './components/common/Loading';
@@ -17,22 +22,30 @@ import './styles/variables.css';
 
 function App() {
   const dispatch = useDispatch();
-  const { loading, user } = useSelector((state) => state.auth);
+  const { loading, user, isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('App startup - Token check:', token ? 'Token exists' : 'No token');
+    
     if (token) {
+      console.log('Token found, loading user...');
       dispatch(loadUser()).catch((err) => {
         console.error('Failed to load user:', err);
-        localStorage.removeItem('token'); // remove invalid token
+        localStorage.removeItem('token');
       });
     }
   }, [dispatch]);
 
-  if (loading) return <Loading fullScreen />;
+  console.log('App state:', { loading, isAuthenticated, user: !!user });
+
+  if (loading) {
+    console.log('App showing loading screen');
+    return <Loading fullScreen message="Loading TaskTide..." />;
+  }
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Toaster
         position="top-right"
         toastOptions={{
@@ -45,24 +58,38 @@ function App() {
         }}
       />
 
-      {/* Test element to check CSS */}
-      <div className="test-css">
-        If you see a yellow background with blue text, CSS loaded!
-      </div>
-
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route 
+          path="/login" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
+        />
+        <Route 
+          path="/register" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} 
+        />
 
         {/* Protected Routes */}
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* Add more protected routes here if needed */}
+          <Route path="/assignments" element={<Assignments />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         {/* Default Route */}
-        <Route path="/" element={<Navigate to={user ? '/dashboard' : '/login'} replace />} />
+        <Route 
+          path="/" 
+          element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} 
+        />
+
+        {/* Catch all route */}
+        <Route 
+          path="*" 
+          element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} 
+        />
       </Routes>
     </Router>
   );

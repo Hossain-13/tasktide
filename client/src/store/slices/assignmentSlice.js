@@ -1,99 +1,111 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import assignmentService from '../../services/assignmentService';
-import toast from 'react-hot-toast';
 
-// Fetch assignments
+// Async thunks
 export const fetchAssignments = createAsyncThunk(
-  'assignments/fetchAll',
+  'assignments/fetchAssignments',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await assignmentService.getAll();
-      return response.data.assignments;
+      const response = await assignmentService.fetchAssignments();
+      return response.data.assignments || response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch assignments');
     }
   }
 );
 
-// Create assignment
 export const createAssignment = createAsyncThunk(
-  'assignments/create',
+  'assignments/createAssignment',
   async (assignmentData, { rejectWithValue }) => {
     try {
-      const response = await assignmentService.create(assignmentData);
-      toast.success('Assignment created successfully!');
-      return response.data.assignment;
+      const response = await assignmentService.createAssignment(assignmentData);
+      return response.data.assignment || response.data;
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to create assignment';
-      toast.error(message);
-      return rejectWithValue(message);
+      return rejectWithValue(error.response?.data?.message || 'Failed to create assignment');
     }
   }
 );
 
-// Update assignment
 export const updateAssignment = createAsyncThunk(
-  'assignments/update',
+  'assignments/updateAssignment',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await assignmentService.update(id, data);
-      toast.success('Assignment updated successfully!');
-      return response.data.assignment;
+      const response = await assignmentService.updateAssignment(id, data);
+      return response.data.assignment || response.data;
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to update assignment';
-      toast.error(message);
-      return rejectWithValue(message);
+      return rejectWithValue(error.response?.data?.message || 'Failed to update assignment');
     }
   }
 );
 
-// Delete assignment
 export const deleteAssignment = createAsyncThunk(
-  'assignments/delete',
+  'assignments/deleteAssignment',
   async (id, { rejectWithValue }) => {
     try {
-      await assignmentService.delete(id);
-      toast.success('Assignment deleted successfully!');
+      await assignmentService.deleteAssignment(id);
       return id;
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to delete assignment';
-      toast.error(message);
-      return rejectWithValue(message);
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete assignment');
     }
   }
 );
 
-// Complete assignment
 export const completeAssignment = createAsyncThunk(
-  'assignments/complete',
-  async (id, { rejectWithValue }) => {
+  'assignments/completeAssignment',
+  async (assignmentId, { rejectWithValue }) => {
     try {
-      const response = await assignmentService.complete(id);
-      toast.success('Assignment marked as complete!');
-      return response.data.assignment;
+      const response = await assignmentService.completeAssignment(assignmentId);
+      return response.data.assignment || { id: assignmentId, status: 'completed' };
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to complete assignment';
-      toast.error(message);
-      return rejectWithValue(message);
+      return rejectWithValue(error.response?.data?.message || 'Failed to complete assignment');
     }
   }
 );
+
+const initialState = {
+  assignments: [],
+  loading: false,
+  error: null,
+  filters: {
+    status: 'all',
+    priority: 'all',
+    search: '',
+  },
+  sortBy: 'dueDate_asc',
+};
 
 const assignmentSlice = createSlice({
   name: 'assignments',
-  initialState: {
-    assignments: [],
-    loading: false,
-    error: null,
-    filters: {
-      status: 'all',
-      priority: 'all',
-      course: 'all',
-      search: '',
-    },
-    sortBy: 'dueDate',
-  },
+  initialState,
   reducers: {
+    setAssignments: (state, action) => {
+      state.assignments = action.payload;
+    },
+    addAssignment: (state, action) => {
+      state.assignments.push(action.payload);
+    },
+    updateAssignmentLocal: (state, action) => {
+      const index = state.assignments.findIndex(
+        a => a._id === action.payload._id || a.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.assignments[index] = { ...state.assignments[index], ...action.payload };
+      }
+    },
+    removeAssignment: (state, action) => {
+      state.assignments = state.assignments.filter(
+        a => a._id !== action.payload && a.id !== action.payload
+      );
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
     setFilter: (state, action) => {
       state.filters = { ...state.filters, ...action.payload };
     },
@@ -101,55 +113,116 @@ const assignmentSlice = createSlice({
       state.sortBy = action.payload;
     },
     clearFilters: (state) => {
-      state.filters = {
-        status: 'all',
-        priority: 'all',
-        course: 'all',
-        search: '',
-      };
+      state.filters = { status: 'all', priority: 'all', search: '' };
+      state.sortBy = 'dueDate_asc';
     },
   },
   extraReducers: (builder) => {
-    // Fetch assignments
-    builder.addCase(fetchAssignments.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(fetchAssignments.fulfilled, (state, action) => {
-      state.loading = false;
-      state.assignments = action.payload;
-    });
-    builder.addCase(fetchAssignments.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+    builder
+      // Fetch
+      .addCase(fetchAssignments.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAssignments.fulfilled, (state, action) => {
+        state.loading = false;
+        state.assignments = Array.isArray(action.payload) ? action.payload : [];
+      })
+      .addCase(fetchAssignments.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    // Create assignment
-    builder.addCase(createAssignment.fulfilled, (state, action) => {
-      state.assignments.push(action.payload);
-    });
+      // Create
+      .addCase(createAssignment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createAssignment.fulfilled, (state, action) => {
+        state.loading = false;
+        const newAssignment = {
+          id: action.payload.id || action.payload._id,
+          _id: action.payload._id || action.payload.id,
+          title: action.payload.title || '',
+          description: action.payload.description || '',
+          status: action.payload.status || 'pending',
+          priority: action.payload.priority || 'medium',
+          dueDate: action.payload.dueDate || null,
+        };
+        state.assignments.push(newAssignment);
+      })
+      .addCase(createAssignment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    // Update assignment
-    builder.addCase(updateAssignment.fulfilled, (state, action) => {
-      const index = state.assignments.findIndex(a => a.id === action.payload.id);
-      if (index !== -1) {
-        state.assignments[index] = action.payload;
-      }
-    });
+      // Update
+      .addCase(updateAssignment.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateAssignment.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.assignments.findIndex(
+          a => a._id === action.payload._id || a.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.assignments[index] = action.payload;
+        }
+      })
+      .addCase(updateAssignment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    // Delete assignment
-    builder.addCase(deleteAssignment.fulfilled, (state, action) => {
-      state.assignments = state.assignments.filter(a => a.id !== action.payload);
-    });
+      // Delete
+      .addCase(deleteAssignment.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteAssignment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.assignments = state.assignments.filter(
+          a => a._id !== action.payload && a.id !== action.payload
+        );
+      })
+      .addCase(deleteAssignment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    // Complete assignment
-    builder.addCase(completeAssignment.fulfilled, (state, action) => {
-      const index = state.assignments.findIndex(a => a.id === action.payload.id);
-      if (index !== -1) {
-        state.assignments[index] = action.payload;
-      }
-    });
+      // Complete
+      .addCase(completeAssignment.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(completeAssignment.fulfilled, (state, action) => {
+        state.loading = false;
+        const assignment = state.assignments.find(
+          a =>
+            a._id === action.payload.id ||
+            a.id === action.payload.id ||
+            a._id === action.payload._id
+        );
+        if (assignment) {
+          assignment.status = 'completed';
+        }
+      })
+      .addCase(completeAssignment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
-export const { setFilter, setSortBy, clearFilters } = assignmentSlice.actions;
+export const {
+  setAssignments,
+  addAssignment,
+  updateAssignmentLocal,
+  removeAssignment,
+  setLoading,
+  setError,
+  clearError,
+  setFilter,
+  setSortBy,
+  clearFilters,
+} = assignmentSlice.actions;
+
 export default assignmentSlice.reducer;

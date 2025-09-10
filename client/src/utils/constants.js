@@ -4,7 +4,7 @@ export const APP_NAME = 'TaskTide';
 export const APP_VERSION = '1.0.0';
 
 // API Configuration
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+export const API_BASE_URL = 'http://localhost:5000/api';
 export const API_TIMEOUT = 10000; // 10 seconds
 
 // Assignment Priority Levels

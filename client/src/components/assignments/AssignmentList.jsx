@@ -4,11 +4,9 @@ import AssignmentCard from './AssignmentCard';
 import Loading from '../common/Loading';
 
 function AssignmentList({ onAssignmentClick }) {
-  const { assignments, loading, filters, sortBy } = useSelector(
-    (state) => state.assignments
-  );
+  const { assignments = [], loading, filters = { status: 'all', priority: 'all', search: '' }, sortBy } =
+    useSelector((state) => state.assignments || {});
 
-  // Filter assignments
   let filteredAssignments = [...assignments];
 
   if (filters.status !== 'all') {

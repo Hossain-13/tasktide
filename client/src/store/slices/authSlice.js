@@ -1,16 +1,21 @@
+// client/src/store/slices/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authService from '../../services/authService';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
-// Load user
 export const loadUser = createAsyncThunk(
   'auth/loadUser',
   async (_, { rejectWithValue }) => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+      
       const response = await authService.getMe();
       return response.data.user;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to load user');
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -21,20 +26,29 @@ export const login = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await authService.login(credentials);
-      return response.data;
+      
+      // Backend returns { success: true, token: "...", user: {...} }
+      return {
+        user: response.data.user,
+        token: response.data.token
+      };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Login failed');
     }
   }
 );
-
 // Register
 export const register = createAsyncThunk(
   'auth/register',
   async (userData, { rejectWithValue }) => {
     try {
       const response = await authService.register(userData);
-      return response.data;
+      
+      // Backend returns { success: true, token: "...", user: {...} }
+      return {
+        user: response.data.user,
+        token: response.data.token
+      };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Registration failed');
     }
@@ -47,7 +61,7 @@ const authSlice = createSlice({
     user: null,
     token: localStorage.getItem('token'),
     isAuthenticated: false,
-    loading: true,
+    loading: false,  // Change this from true to false
     error: null,
   },
   reducers: {
@@ -73,12 +87,12 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.user = action.payload;
     });
-    builder.addCase(loadUser.rejected, (state) => {
-      state.loading = false;
+    builder.addCase(loadUser.rejected, (state, action) => {
+      state.loading = false;  // This is the key fix
       state.isAuthenticated = false;
       state.user = null;
-      localStorage.removeItem('token');
-    });
+      localStorage.removeItem('token'); // Clean up any invalid token
+   });
 
     // Login
     builder.addCase(login.pending, (state) => {

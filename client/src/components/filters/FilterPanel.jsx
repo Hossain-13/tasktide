@@ -5,7 +5,8 @@ import { PRIORITY_LEVELS, ASSIGNMENT_STATUS } from '../../utils/constants';
 
 function FilterPanel() {
   const dispatch = useDispatch();
-  const { filters } = useSelector((state) => state.assignments);
+  const { filters = { status: 'all', priority: 'all', search: '' } } =
+    useSelector((state) => state.assignments || {});
 
   const handleFilterChange = (filterType, value) => {
     dispatch(setFilter({ [filterType]: value }));
