@@ -1,0 +1,689 @@
+{
+  "info": {
+    "name": "TaskTide API",
+    "description": "Complete API collection for TaskTide application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('token', response.token);",
+                  "    pm.environment.set('userId', response.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"student@test.com\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/auth/me",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Name\",\n    \"preferences\": {\n        \"theme\": \"dark\"\n    }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/profile",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "auth", "profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Assignments",
+      "item": [
+        {
+          "name": "Get All Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/assignments",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "assignments"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "disabled": true
+                },
+                {
+                  "key": "priority",
+                  "value": "high",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "-dueDate",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Assignment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/assignments/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "assignments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "assignment_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"New Assignment\",\n    \"description\": \"Assignment description\",\n    \"dueDate\": \"2024-12-31T23:59:59Z\",\n    \"priority\": \"medium\",\n    \"estimatedTime\": 120,\n    \"tags\": [\"homework\", \"important\"]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/assignments",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "assignments"]
+            }
+          }
+        },
+        {
+          "name": "Update Assignment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Updated Assignment Title\",\n    \"priority\": \"high\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/assignments/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "assignments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "assignment_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Complete Assignment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5000/api/assignments/:id/complete",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "assignments", ":id", "complete"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "assignment_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Assignment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+             "raw": "http://localhost:5000/api/assignments/:id",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "assignments", ":id"],
+             "variable": [
+               {
+                 "key": "id",
+                 "value": "assignment_id_here"
+               }
+             ]
+           }
+         }
+       },
+       {
+         "name": "Get Calendar Data",
+         "request": {
+           "method": "GET",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/assignments/calendar",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "assignments", "calendar"],
+             "query": [
+               {
+                 "key": "startDate",
+                 "value": "2024-01-01",
+                 "disabled": true
+               },
+               {
+                 "key": "endDate",
+                 "value": "2024-12-31",
+                 "disabled": true
+               }
+             ]
+           }
+         }
+       }
+     ]
+   },
+   {
+     "name": "Courses",
+     "item": [
+       {
+         "name": "Get All Courses",
+         "request": {
+           "method": "GET",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/courses",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "courses"]
+           }
+         }
+       },
+       {
+         "name": "Create Course",
+         "request": {
+           "method": "POST",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             },
+             {
+               "key": "Content-Type",
+               "value": "application/json"
+             }
+           ],
+           "body": {
+             "mode": "raw",
+             "raw": "{\n    \"name\": \"Web Development\",\n    \"code\": \"CSE 401\",\n    \"instructor\": \"Prof. Anderson\",\n    \"color\": \"#FF6B6B\",\n    \"semester\": \"Spring 2024\",\n    \"credits\": 3\n}"
+           },
+           "url": {
+             "raw": "http://localhost:5000/api/courses",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "courses"]
+           }
+         }
+       },
+       {
+         "name": "Update Course",
+         "request": {
+           "method": "PUT",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             },
+             {
+               "key": "Content-Type",
+               "value": "application/json"
+             }
+           ],
+           "body": {
+             "mode": "raw",
+             "raw": "{\n    \"name\": \"Updated Course Name\",\n    \"color\": \"#4ECDC4\"\n}"
+           },
+           "url": {
+             "raw": "http://localhost:5000/api/courses/:id",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "courses", ":id"],
+             "variable": [
+               {
+                 "key": "id",
+                 "value": "course_id_here"
+               }
+             ]
+           }
+         }
+       },
+       {
+         "name": "Delete Course",
+         "request": {
+           "method": "DELETE",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/courses/:id",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "courses", ":id"],
+             "variable": [
+               {
+                 "key": "id",
+                 "value": "course_id_here"
+               }
+             ]
+           }
+         }
+       }
+     ]
+   },
+   {
+     "name": "Timer",
+     "item": [
+       {
+         "name": "Start Timer",
+         "request": {
+           "method": "POST",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             },
+             {
+               "key": "Content-Type",
+               "value": "application/json"
+             }
+           ],
+           "body": {
+             "mode": "raw",
+             "raw": "{\n    \"assignmentId\": \"assignment_id_here\",\n    \"sessionType\": \"pomodoro\",\n    \"duration\": 1500\n}"
+           },
+           "url": {
+             "raw": "http://localhost:5000/api/timer/start",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "timer", "start"]
+           }
+         }
+       },
+       {
+         "name": "Stop Timer",
+         "request": {
+           "method": "PUT",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/timer/stop/:sessionId",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "timer", "stop", ":sessionId"],
+             "variable": [
+               {
+                 "key": "sessionId",
+                 "value": "session_id_here"
+               }
+             ]
+           }
+         }
+       },
+       {
+         "name": "Get Timer Stats",
+         "request": {
+           "method": "GET",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/timer/stats",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "timer", "stats"]
+           }
+         }
+       },
+       {
+         "name": "Get Timer History",
+         "request": {
+           "method": "GET",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/timer/history",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "timer", "history"]
+           }
+         }
+       }
+     ]
+   },
+   {
+     "name": "Notifications",
+     "item": [
+       {
+         "name": "Get Notifications",
+         "request": {
+           "method": "GET",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/notifications",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "notifications"]
+           }
+         }
+       },
+       {
+         "name": "Mark as Read",
+         "request": {
+           "method": "PATCH",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/notifications/:id/read",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "notifications", ":id", "read"],
+             "variable": [
+               {
+                 "key": "id",
+                 "value": "notification_id_here"
+               }
+             ]
+           }
+         }
+       },
+       {
+         "name": "Mark All as Read",
+         "request": {
+           "method": "PATCH",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/notifications/read-all",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "notifications", "read-all"]
+           }
+         }
+       }
+     ]
+   },
+   {
+     "name": "Export",
+     "item": [
+       {
+         "name": "Export PDF",
+         "request": {
+           "method": "GET",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/export/pdf",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "export", "pdf"]
+           }
+         }
+       },
+       {
+         "name": "Export CSV",
+         "request": {
+           "method": "GET",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/export/csv",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "export", "csv"]
+           }
+         }
+       },
+       {
+         "name": "Export Text",
+         "request": {
+           "method": "GET",
+           "header": [
+             {
+               "key": "Authorization",
+               "value": "Bearer {{token}}"
+             }
+           ],
+           "url": {
+             "raw": "http://localhost:5000/api/export/txt",
+             "protocol": "http",
+             "host": ["localhost"],
+             "port": "5000",
+             "path": ["api", "export", "txt"]
+           }
+         }
+       }
+     ]
+   }
+ ],
+ "event": [
+   {
+     "listen": "prerequest",
+     "script": {
+       "type": "text/javascript",
+       "exec": [""]
+     }
+   },
+   {
+     "listen": "test",
+     "script": {
+       "type": "text/javascript",
+       "exec": [""]
+     }
+   }
+ ],
+ "variable": [
+   {
+     "key": "token",
+     "value": "",
+     "type": "string"
+   },
+   {
+     "key": "userId",
+     "value": "",
+     "type": "string"
+   }
+ ]
+}

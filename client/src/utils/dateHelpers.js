@@ -152,3 +152,8 @@ export const shouldSendReminder = (dueDate, reminderMinutes) => {
   
   return minutesUntilReminder >= 0 && minutesUntilReminder <= 1;
 };
+
+export const isTodayDate = (date) => {
+  if (!date) return false;
+  return isToday(new Date(date));
+};

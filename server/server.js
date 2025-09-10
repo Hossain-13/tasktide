@@ -1,9 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
+const connectDB = require('./config/database'); // <-- Add this line
+const assignmentRoutes = require('./routes/assignment.routes');
 
 // Load environment variables
 dotenv.config();
+
+connectDB(); // <-- And this line
 
 // Create Express app
 const app = express();
@@ -37,6 +42,17 @@ app.get('/api/test', (req, res) => {
     }
   });
 });
+
+// Serve Postman collection
+app.get('/postman', (req, res) => {
+  res.sendFile(path.join(__dirname, '../tasktide.postman_collection.json'));
+});
+
+// Auth routes
+app.use('/api/auth', require('./routes/auth.routes'));
+
+// Register assignment routes
+app.use('/api/assignments', assignmentRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
